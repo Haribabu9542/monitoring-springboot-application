@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      # Port used for the Zipkin UI and HTTP Api
+      - 9411:9411
+
+
+  
+
+  postgres:
+    container_name: postgre
+    image: postgres
+    environment:
+      POSTGRES_USER: haribabu
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadm  
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-hari@gmail.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN-CONFIG-SERVER_MODE: "False"
+    #      PGADMIN_LISTEN_PORT: 80
+
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:5050"
+
+    restart: unless-stopped
+  
+  zipkin-test:
+    # container_name: zipkin-test
+    build:
+      context: ../zipkin-test/
+      dockerfile: Dockerfile
+    depends_on:
+      - zipkin
+      # - postgres
+    ports:
+      - "8083:8083"
+volumes:
+  db-data:
+  pgadmin-data:
